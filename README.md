@@ -178,5 +178,5 @@ MIT
 **Danni Han (Gloria)**  
 Web3 Frontend Developer  
 📧 gloria_2384619@proton.me  
-💬 Discord: gloria  
+💬 Discord: gloria01744  
 🔗 GitHub: [github.com/gloria238](https://github.com/gloria238)
