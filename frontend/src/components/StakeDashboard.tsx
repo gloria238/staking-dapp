@@ -26,65 +26,75 @@ export const StakeDashboard = () => {
     return () => clearTimeout(timer)
   }, [])
 
-  // 如果尚未挂载，显示加载状态（避免水合问题）
   if (!isMounted) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-amber-500/20 border-t-amber-400 rounded-full animate-spin" />
       </div>
     )
   }
 
-  // 未连接钱包时显示登录界面
   if (!isConnected) {
     return <WalletLogin />
   }
 
-  // 连接后显示仪表板
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      {/* 顶部栏：标题 + 登出按钮 */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+          <h1
+            className="text-3xl sm:text-4xl font-bold tracking-tight text-white"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
             Staking Dashboard
           </h1>
-          <p className="text-sm text-gray-400 mt-1">
+          <p className="text-sm text-slate-400 mt-1">
             Connected: {formatAddress(address)}
           </p>
         </div>
         <button
           onClick={() => disconnect()}
-          className="mt-4 sm:mt-0 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+          className="mt-4 sm:mt-0 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-400 hover:text-white hover:bg-white/10 hover:border-red-500/20 transition-all duration-200 cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
           Disconnect
         </button>
       </div>
 
-      {/* 统计卡片 */}
-      <div className="mb-8">
+      {/* Stats */}
+      <div className="mb-8 animate-fade-in">
         <DashboardStats loading={statsLoading} />
       </div>
 
-      {/* 图表 + 质押操作 */}
+      {/* Chart + Stake */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="lg:col-span-2">
           <PnlChart />
         </div>
         <div className="lg:col-span-1">
-          <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-6 backdrop-blur-sm">
-            <h2 className="text-lg font-semibold text-white mb-4">Stake / Withdraw</h2>
+          <div className="card">
+            <h2
+              className="text-lg font-semibold text-white mb-4"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              Stake / Withdraw
+            </h2>
             <StakeButton />
           </div>
         </div>
       </div>
 
-      {/* 事件 + 历史表格 */}
+      {/* Events + History */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
-          <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-6 backdrop-blur-sm">
-            <h2 className="text-lg font-semibold text-white mb-4">Recent Activity</h2>
+          <div className="card">
+            <h2
+              className="text-lg font-semibold text-white mb-4"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              Recent Activity
+            </h2>
             <EventList events={events} />
           </div>
         </div>

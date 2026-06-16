@@ -38,24 +38,31 @@ export function PnlChart() {
   const data = generateData(range)
 
   const ranges: { key: RangeKey; label: string }[] = [
-    { key: '7D', label: '7 Days' },
-    { key: '30D', label: '30 Days' },
-    { key: '90D', label: '90 Days' },
+    { key: '7D', label: '7D' },
+    { key: '30D', label: '30D' },
+    { key: '90D', label: '90D' },
   ]
 
+  const title = range === '7D' ? 'Weekly PNL' : range === '30D' ? 'Monthly PNL' : 'Quarterly PNL'
+
   return (
-    <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-6 backdrop-blur-sm">
+    <div className="card">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <h3 className="text-lg font-semibold text-white">Weekly PNL</h3>
+        <h3
+          className="text-lg font-semibold text-white"
+          style={{ fontFamily: 'var(--font-heading)' }}
+        >
+          {title}
+        </h3>
         <div className="flex items-center gap-1 bg-white/5 rounded-xl p-1">
           {ranges.map((r) => (
             <button
               key={r.key}
               onClick={() => setRange(r.key)}
-              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors duration-200 cursor-pointer ${
                 range === r.key
-                  ? 'bg-cyan-500/20 text-cyan-400'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-amber-500/20 text-amber-400'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               {r.label}
@@ -64,14 +71,13 @@ export function PnlChart() {
         </div>
       </div>
 
-      {/* 关键：min-w-0 防止 grid/flex 子元素宽度塌陷，minHeight={1} 保证高度有效 */}
       <div className="h-64 min-h-64 min-w-0" style={{ height: 256, minWidth: 0 }}>
-  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={1}>
-    <AreaChart data={data}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={1}>
+          <AreaChart data={data}>
             <defs>
               <linearGradient id="pnlGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#00F0FF" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#00F0FF" stopOpacity={0} />
+                <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="#F59E0B" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -79,25 +85,25 @@ export function PnlChart() {
               dataKey="day"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 12 }}
+              tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 12 }}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 12 }}
+              tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 12 }}
             />
             <Tooltip
               contentStyle={{
-                background: '#1A1B3A',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: '#0F172A',
+                border: '1px solid rgba(245, 158, 11, 0.2)',
                 borderRadius: '12px',
-                color: '#fff',
+                color: '#F8FAFC',
               }}
             />
             <Area
               type="monotone"
               dataKey="pnl"
-              stroke="#00F0FF"
+              stroke="#F59E0B"
               strokeWidth={2}
               fill="url(#pnlGradient)"
             />

@@ -15,23 +15,26 @@ export function DashboardStats({ loading = false }: { loading?: boolean }) {
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="rounded-2xl border border-white/5 bg-white/[0.03] p-5 backdrop-blur-sm hover:bg-white/[0.06] transition-colors"
+          className="card hover:border-amber-500/10 transition-all duration-200 cursor-pointer"
         >
           {loading ? (
-            <div className="space-y-3 animate-pulse">
-              <div className="h-3 bg-white/10 rounded w-2/3" />
-              <div className="h-6 bg-white/10 rounded w-1/2" />
-              <div className="h-3 bg-white/10 rounded w-1/3" />
+            <div className="space-y-3">
+              <div className="skeleton h-3 w-2/3" />
+              <div className="skeleton h-6 w-1/2" />
+              <div className="skeleton h-3 w-1/3" />
             </div>
           ) : (
             <>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+                <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
                   {stat.label}
                 </span>
-                <stat.icon className="w-4 h-4 text-gray-500" />
+                <stat.icon className={`w-4 h-4 ${stat.positive ? 'text-amber-400' : 'text-slate-500'}`} />
               </div>
-              <div className="text-2xl font-bold text-white tracking-tight mb-1">
+              <div
+                className="text-2xl font-bold text-white tracking-tight mb-1"
+                style={{ fontFamily: 'var(--font-heading)' }}
+              >
                 {stat.value}
               </div>
               <span

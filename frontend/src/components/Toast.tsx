@@ -23,16 +23,16 @@ export function Toast({ type, message, visible, onClose }: ToastProps) {
   if (!visible) return null
 
   const icons = {
-    loading: <Loader2 className="w-5 h-5 animate-spin text-cyan-400" />,
+    loading: <Loader2 className="w-5 h-5 animate-spin text-amber-400" />,
     success: <CheckCircle className="w-5 h-5 text-emerald-400" />,
-    error: <XCircle className="w-5 h-5 text-rose-400" />,
+    error: <XCircle className="w-5 h-5 text-red-400" />,
   }
 
   return (
     <div className="fixed top-6 right-6 z-50 animate-slide-in">
-      <div className="flex items-center gap-3 bg-[#1A1B3A] border border-white/10 rounded-xl px-5 py-4 shadow-2xl backdrop-blur-xl">
+      <div className="flex items-center gap-3 bg-[#0F172A] border border-white/10 rounded-xl px-5 py-4 shadow-2xl backdrop-blur-xl">
         {icons[type]}
-        <span className="text-sm text-white">{message}</span>
+        <span className="text-sm text-slate-200">{message}</span>
       </div>
     </div>
   )

@@ -41,7 +41,7 @@ const columns: ColumnDef<StakingRecord>[] = [
     accessorKey: 'user',
     header: 'User',
     cell: ({ row }) => (
-      <span className="font-mono text-xs text-gray-300" title={row.original.user}>
+      <span className="font-mono text-xs text-slate-300" title={row.original.user}>
         {row.original.user}
       </span>
     ),
@@ -55,7 +55,7 @@ const columns: ColumnDef<StakingRecord>[] = [
         <span
           className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
             action === 'Stake'
-              ? 'bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 text-emerald-400 border border-emerald-400/20'
+              ? 'bg-gradient-to-r from-amber-500/20 to-amber-600/20 text-amber-400 border border-amber-400/20'
               : 'bg-gradient-to-r from-rose-500/20 to-rose-600/20 text-rose-400 border border-rose-400/20'
           }`}
         >
@@ -68,7 +68,7 @@ const columns: ColumnDef<StakingRecord>[] = [
     accessorKey: 'amount',
     header: ({ column }) => (
       <button
-        className="flex items-center gap-1 text-gray-400 hover:text-cyan-400 transition-colors"
+        className="flex items-center gap-1 text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
         Amount
@@ -76,13 +76,13 @@ const columns: ColumnDef<StakingRecord>[] = [
         {column.getIsSorted() === 'desc' && <ChevronDown className="w-4 h-4" />}
       </button>
     ),
-    cell: ({ row }) => <span className="font-mono text-gray-200">{row.original.amount.toLocaleString()}</span>,
+    cell: ({ row }) => <span className="font-mono text-slate-200">{row.original.amount.toLocaleString()}</span>,
   },
   {
     accessorKey: 'timestamp',
     header: ({ column }) => (
       <button
-        className="flex items-center gap-1 text-gray-400 hover:text-cyan-400 transition-colors"
+        className="flex items-center gap-1 text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
         Time
@@ -90,7 +90,7 @@ const columns: ColumnDef<StakingRecord>[] = [
         {column.getIsSorted() === 'desc' && <ChevronDown className="w-4 h-4" />}
       </button>
     ),
-    cell: ({ row }) => <span className="text-xs text-gray-300 whitespace-nowrap">{row.original.timestamp}</span>,
+    cell: ({ row }) => <span className="text-xs text-slate-300 whitespace-nowrap">{row.original.timestamp}</span>,
   },
   {
     accessorKey: 'txHash',
@@ -100,7 +100,7 @@ const columns: ColumnDef<StakingRecord>[] = [
         href={`https://etherscan.io/tx/${row.original.txHash}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="font-mono text-xs text-cyan-400 hover:text-cyan-300 hover:underline transition-colors"
+        className="font-mono text-xs text-amber-400 hover:text-amber-300 hover:underline transition-colors"
         title={row.original.txHash}
       >
         {row.original.txHash}
@@ -129,23 +129,29 @@ export function StakingHistoryTable() {
   })
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-6 backdrop-blur-sm">
-      {/* 标题与搜索栏 */}
+    <div className="card">
+      {/* Header + Search */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <h3 className="text-lg font-semibold text-white">Staking History</h3>
+        <h3
+          className="text-lg font-semibold text-white"
+          style={{ fontFamily: 'var(--font-heading)' }}
+        >
+          Staking History
+        </h3>
         <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <input
             type="text"
             placeholder="Search address or amount..."
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-200 placeholder-gray-500 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
+            className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all"
+            aria-label="Search staking history"
           />
         </div>
       </div>
 
-      {/* 表格容器 */}
+      {/* Table */}
       <div className="overflow-x-auto rounded-xl border border-white/5">
         <table className="w-full text-sm">
           <thead>
@@ -158,7 +164,7 @@ export function StakingHistoryTable() {
                       ? headerContent(header.getContext())
                       : headerContent
                   return (
-                    <th key={header.id} className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    <th key={header.id} className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                       {header.isPlaceholder ? null : renderedHeader}
                     </th>
                   )
@@ -168,28 +174,28 @@ export function StakingHistoryTable() {
           </thead>
           <tbody>
             {table.getRowModel().rows.length === 0 ? (
-               <tr>
-      <td colSpan={columns.length} className="px-6 py-16 text-center">
-        <div className="flex flex-col items-center gap-4">
-          <Database className="w-12 h-12 text-gray-600" />
-          <div className="space-y-1">
-            <p className="text-gray-400 text-sm font-medium">No records found.</p>
-            <p className="text-gray-500 text-xs">
-              {globalFilter
-                ? 'Try adjusting your search or filters.'
-                : 'Staking activity will appear here once transactions occur.'}
-            </p>
-          </div>
-        </div>
-      </td>
-    </tr>
+              <tr>
+                <td colSpan={columns.length} className="px-6 py-16 text-center">
+                  <div className="flex flex-col items-center gap-4">
+                    <Database className="w-12 h-12 text-slate-600" />
+                    <div className="space-y-1">
+                      <p className="text-slate-400 text-sm font-medium">No records found.</p>
+                      <p className="text-slate-600 text-xs">
+                        {globalFilter
+                          ? 'Try adjusting your search or filters.'
+                          : 'Staking activity will appear here once transactions occur.'}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
             ) : (
               table.getRowModel().rows.map((row, index) => (
                 <tr
                   key={row.id}
                   className={`border-b border-white/5 transition-colors ${
-                    index % 2 === 0 ? 'bg-white/[0.02]' : 'bg-white/[0.04]'
-                  } hover:bg-white/[0.08]`}
+                    index % 2 === 0 ? 'bg-white/[0.01]' : 'bg-white/[0.03]'
+                  } hover:bg-amber-500/[0.04]`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="px-6 py-4">
@@ -203,40 +209,40 @@ export function StakingHistoryTable() {
         </table>
       </div>
 
-      {/* 分页控件 */}
+      {/* Pagination */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-slate-500">
           Showing {table.getRowModel().rows.length} of {STATIC_MOCK_DATA.length} records
         </span>
         <div className="flex items-center gap-2">
           <button
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-cyan-400 hover:border-cyan-400/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="px-3 py-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-amber-400 hover:border-amber-400/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             {'<<'}
           </button>
           <button
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="px-4 py-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-cyan-400 hover:border-cyan-400/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-amber-400 hover:border-amber-400/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             Previous
           </button>
-          <span className="text-sm text-gray-300 px-2">
+          <span className="text-sm text-slate-300 px-2">
             Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
           </span>
           <button
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="px-4 py-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-cyan-400 hover:border-cyan-400/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-amber-400 hover:border-amber-400/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             Next
           </button>
           <button
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-cyan-400 hover:border-cyan-400/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="px-3 py-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-amber-400 hover:border-amber-400/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             {'>>'}
           </button>

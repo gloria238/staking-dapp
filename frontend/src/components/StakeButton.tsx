@@ -28,6 +28,12 @@ type TxState =
   | 'success'
   | 'error'
 
+const GAS_LIMITS = {
+  approve: BigInt(100_000),
+  stake: BigInt(200_000),
+  withdraw: BigInt(200_000),
+}
+
 export const StakeButton = () => {
   const { address } = useAccount()
   const publicClient = usePublicClient()
@@ -68,65 +74,60 @@ export const StakeButton = () => {
     state === 'withdrawing' ||
     state === 'confirming'
 
-const handleStake = async () => {
-  if (!address || !publicClient || amount === BigInt(0)) return
+  const handleStake = async () => {
+    if (!address || !publicClient || amount === BigInt(0)) return
 
-  try {
-    // 1. 获取链上最新的授权额度（绕过 React Query 缓存）
-    const { data: freshAllowance } = await refetchAllowance()
-    const currentAllowance = toBigIntSafe(freshAllowance)
+    try {
+      const { data: freshAllowance } = await refetchAllowance()
+      const currentAllowance = toBigIntSafe(freshAllowance)
 
-    // 2. 如果额度不足，先授权
-    if (currentAllowance < amount) {
-      setState('approving')
-      setToast({ show: true, type: 'loading', message: 'Approving tokens...' })
+      if (currentAllowance < amount) {
+        setState('approving')
+        setToast({ show: true, type: 'loading', message: 'Approving tokens...' })
 
-      const approveHash = await writeApprove({
-        address: tokenAddress,
-        abi: tokenConfig.abi,
-        functionName: 'approve',
-        args: [stakingAddress, amount],
-        gas: BigInt(100_000),
-      })
-      setHash(approveHash)
+        const approveHash = await writeApprove({
+          address: tokenAddress,
+          abi: tokenConfig.abi,
+          functionName: 'approve',
+          args: [stakingAddress, amount],
+          gas: GAS_LIMITS.approve,
+        })
+        setHash(approveHash)
 
-      await publicClient.waitForTransactionReceipt({ hash: approveHash })
+        await publicClient.waitForTransactionReceipt({ hash: approveHash })
 
-      // 再次刷新额度并验证，确保授权确实成功
-      const { data: newAllowance } = await refetchAllowance()
-      if (toBigIntSafe(newAllowance) < amount) {
-        throw new Error('Approval succeeded but allowance still insufficient.')
+        const { data: newAllowance } = await refetchAllowance()
+        if (toBigIntSafe(newAllowance) < amount) {
+          throw new Error('Approval succeeded but allowance still insufficient.')
+        }
       }
+
+      setState('staking')
+      setToast({ show: true, type: 'loading', message: 'Staking...' })
+
+      const stakeHash = await writeStake({
+        address: stakingAddress,
+        abi: stakingConfig.abi,
+        functionName: 'stake',
+        args: [amount],
+        gas: GAS_LIMITS.stake,
+      })
+      setHash(stakeHash)
+
+      setState('confirming')
+      await publicClient.waitForTransactionReceipt({ hash: stakeHash })
+
+      await refetchBalance()
+      await refetchStaked()
+
+      setState('success')
+      setToast({ show: true, type: 'success', message: 'Staked successfully!' })
+    } catch (error) {
+      console.error(error)
+      setState('error')
+      setToast({ show: true, type: 'error', message: 'Staking failed. Please try again.' })
     }
-
-    // 3. 执行质押
-    setState('staking')
-    setToast({ show: true, type: 'loading', message: 'Staking...' })
-
-    const stakeHash = await writeStake({
-      address: stakingAddress,
-      abi: stakingConfig.abi,
-      functionName: 'stake',
-      args: [amount],
-      gas: BigInt(200_000),
-    })
-    setHash(stakeHash)
-
-    setState('confirming')
-    await publicClient.waitForTransactionReceipt({ hash: stakeHash })
-
-    // 4. 刷新余额
-    await refetchBalance()
-    await refetchStaked()
-
-    setState('success')
-    setToast({ show: true, type: 'success', message: 'Staked successfully!' })
-  } catch (error) {
-    console.error(error)
-    setState('error')
-    setToast({ show: true, type: 'error', message: 'Staking failed. Please try again.' })
   }
-}
 
   const handleWithdraw = async () => {
     if (!address || !publicClient || amount === BigInt(0)) return
@@ -139,7 +140,7 @@ const handleStake = async () => {
         abi: stakingConfig.abi,
         functionName: 'withdraw',
         args: [amount],
-        gas: BigInt(200_000),
+        gas: GAS_LIMITS.withdraw,
       })
       setHash(withdrawHash)
 
@@ -159,31 +160,35 @@ const handleStake = async () => {
 
   return (
     <div className="space-y-5">
-      {/* 余额展示 */}
+      {/* Balances */}
       <div className="space-y-2 text-sm">
         <div className="flex justify-between items-center">
-          <span className="text-gray-400">Token Balance</span>
-          <span className="data-mono text-cyan-400 font-semibold">{formatAmount(balance)} MTK</span>
+          <span className="text-slate-400">Token Balance</span>
+          <span className="font-mono text-amber-400 font-semibold">{formatAmount(balance)} MTK</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-gray-400">Staked</span>
-          <span className="data-mono text-purple-400 font-semibold">{formatAmount(staked)} MTK</span>
+          <span className="text-slate-400">Staked</span>
+          <span className="font-mono text-violet-400 font-semibold">{formatAmount(staked)} MTK</span>
         </div>
       </div>
 
-      {/* 输入金额 */}
-      <input
-        type="number"
-        min="0"
-        step="0.1"
-        value={inputAmount}
-        onChange={(e) => setInputAmount(e.target.value)}
-        disabled={isLoading}
-        className="w-full"
-        placeholder="Amount"
-      />
+      {/* Amount Input */}
+      <div>
+        <label className="block text-xs text-slate-500 mb-1.5 font-medium">Amount</label>
+        <input
+          type="number"
+          min="0"
+          step="0.1"
+          value={inputAmount}
+          onChange={(e) => setInputAmount(e.target.value)}
+          disabled={isLoading}
+          className="w-full"
+          placeholder="0.0"
+          aria-label="Stake amount"
+        />
+      </div>
 
-      {/* 操作按钮 */}
+      {/* Actions */}
       <div className="flex gap-3">
         <button
           onClick={handleStake}
